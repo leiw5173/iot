@@ -4,7 +4,8 @@ require("@nomicfoundation/hardhat-ethers");
 require("dotenv").config();
 require("hardhat-deploy");
 
-const { NEOX_RPC_URL, PRIVATE_KEY } = process.env;
+const NEOX_RPC_URL = process.env.NEOX_RPC_URL;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -16,7 +17,7 @@ module.exports = {
     },
     neox: {
       url: NEOX_RPC_URL,
-      chainId: 12227,
+      chainId: 12227329,
       accounts: [PRIVATE_KEY],
       blockConfirmations: 2,
     },
