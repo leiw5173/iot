@@ -22,14 +22,16 @@ contract Exchange {
     // The currency that is used in the exchange
     ERC20 public currency;
 
-    // The list of approved sellers
-    address[] public approvedSellers;
-
-    // The list of approved buyers
-    address[] public approvedBuyers;
-
     // Order number
-    uint8 public orderNumber = 0;
+    uint256 public orderNumber = 0;
+
+    // Order Status enum
+    enum OrderStatus {
+        Created,
+        Deposited,
+        Finished,
+        Cancelled
+    }
 
     // The order of the exchange
     struct Order {
@@ -37,49 +39,37 @@ contract Exchange {
         address seller;
         uint256 price;
         uint256 amount;
+        OrderStatus status;
     }
     Order[] public orders;
+
+    // Events
+    event OrderCreated(uint256 orderNumber);
+    event OrderDeposited(uint256 orderNumber);
+    event OrderFinished(uint256 orderNumber);
 
     constructor(ERC20 _currency) {
         owner = msg.sender;
         currency = _currency;
     }
 
-    // Start the exchange
-    function startExchange() public returns (uint256) {
-        require(
-            isAddressInArray(msg.sender, approvedSellers) ||
-                isAddressInArray(msg.sender, approvedBuyers),
-            "Only the Approved Seller or Buyer can start the exchange"
-        );
-        orderNumber++;
-        return orderNumber;
-    }
-
     // The seller set the price of the goods and the amount of goods
-    function setPriceAndGoods(
-        uint256 _price,
-        uint256 _amount,
-        uint8 _orderNumber
-    ) public {
-        require(
-            isAddressInArray(msg.sender, approvedSellers),
-            "Only the Approved Seller can set the price"
+    function setPriceAndGoods(uint256 _price, uint256 _amount) public {
+        require(_price > 0, "The price should be greater than 0");
+        require(_amount > 0, "The amount should be greater than 0");
+        orders.push(
+            Order(address(0), msg.sender, _price, _amount, OrderStatus.Created)
         );
-        orders[_orderNumber].price = _price;
-        orders[_orderNumber].amount = _amount;
-        orders[_orderNumber].seller = msg.sender;
+
+        emit OrderCreated(orderNumber);
+        orderNumber++;
     }
 
     // The buyer deposits the currency into the exchange
     // The buyer should be approved by the owner
     // The depositted currency should link to the order
-    function depositCurrency(uint8 _orderNumber) public {
-        require(orders[_orderNumber].price != 0, "The price is not set yet");
-        require(
-            isAddressInArray(msg.sender, approvedBuyers),
-            "Only the Approved Buyer can deposit the currency"
-        );
+    function depositCurrency(uint256 _orderNumber) public {
+        require(orders[_orderNumber].price != 0, "The order does not exist");
         require(
             currency.balanceOf(msg.sender) >= orders[_orderNumber].price,
             "The buyer does not have enough currency"
@@ -90,11 +80,14 @@ contract Exchange {
             address(this),
             orders[_orderNumber].price
         );
+        emit OrderDeposited(_orderNumber);
+
+        orders[_orderNumber].status = OrderStatus.Deposited;
     }
 
     // The buyer recieves the goods and releases the currency to the seller
     // need to check
-    function receiveGoods(uint8 _orderNumber) public {
+    function receiveGoods(uint256 _orderNumber) public {
         require(
             currency.balanceOf(address(this)) >= orders[_orderNumber].price,
             "The exchange does not have enough currency"
@@ -104,73 +97,27 @@ contract Exchange {
             "Only the buyer can receive the goods"
         );
         require(
-            orders[_orderNumber].amount > 0,
-            "The amount of goods is not set yet"
-        );
-        require(
-            orders[_orderNumber].seller != address(0),
-            "The seller is not set yet"
+            orders[_orderNumber].status == OrderStatus.Deposited,
+            "Order status is not Deposited"
         );
         currency.transfer(
             orders[_orderNumber].seller,
             orders[_orderNumber].price
         );
+        orders[_orderNumber].status = OrderStatus.Finished;
+        emit OrderFinished(_orderNumber);
     }
 
-    // The owner set the list the approved seller
-    function setApprovedSeller(address _seller) public {
-        require(
-            msg.sender == owner,
-            "Only the owner can set the approved seller"
+    function getOrder(
+        uint256 _orderNumber
+    ) public view returns (address, address, uint256, uint256, OrderStatus) {
+        Order memory order = orders[_orderNumber];
+        return (
+            order.buyer,
+            order.seller,
+            order.price,
+            order.amount,
+            order.status
         );
-        approvedSellers.push(_seller);
-    }
-
-    // The owner remove the approved seller
-    function removeApprovedSeller(address _seller) public {
-        require(
-            msg.sender == owner,
-            "Only the owner can remove the approved seller"
-        );
-        for (uint256 i = 0; i < approvedSellers.length; i++) {
-            if (approvedSellers[i] == _seller) {
-                delete approvedSellers[i];
-            }
-        }
-    }
-
-    // The owner set the approved buyer
-    function setApprovedBuyer(address _buyer) public {
-        require(
-            msg.sender == owner,
-            "Only the owner can set the approved buyer"
-        );
-        approvedBuyers.push(_buyer);
-    }
-
-    // The owner remove the approved buyer
-    function removeApprovedBuyer(address _buyer) public {
-        require(
-            msg.sender == owner,
-            "Only the owner can remove the approved buyer"
-        );
-        for (uint256 i = 0; i < approvedBuyers.length; i++) {
-            if (approvedBuyers[i] == _buyer) {
-                delete approvedBuyers[i];
-            }
-        }
-    }
-
-    // Check the address is in the approved list
-    function isAddressInArray(
-        address _address,
-        address[] memory _array
-    ) public pure returns (bool) {
-        for (uint256 i = 0; i < _array.length; i++) {
-            if (_array[i] == _address) {
-                return true;
-            }
-        }
-        return false;
     }
 }
