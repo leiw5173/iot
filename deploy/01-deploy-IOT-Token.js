@@ -19,7 +19,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     deployer = new ethers.Wallet(PRIVATE_KEY, provider);
   }
   // const { deployer } = await getNamedAccounts();
-  console.log("Deploying IOT Token with account:", deployer);
+  console.log("Deploying IOT Token with account:", deployer.address);
   const iotToken = await deploy("Currency", {
     from: deployer.address,
     args: [],
