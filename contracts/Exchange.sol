@@ -17,10 +17,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract Exchange {
     // The owner of the contract
-    address public owner;
+    address public immutable owner;
 
     // The currency that is used in the exchange
-    ERC20 public currency;
+    ERC20 public immutable currency;
 
     // Order number
     uint256 public orderNumber = 0;
