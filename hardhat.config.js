@@ -5,6 +5,7 @@ require("dotenv").config();
 require("hardhat-deploy");
 
 const NEOX_RPC_URL = process.env.NEOX_RPC_URL;
+const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const PRIVATE_KEY_1 = process.env.PRIVATE_KEY_1;
 const PRIVATE_KEY_2 = process.env.PRIVATE_KEY_2;
@@ -22,6 +23,12 @@ module.exports = {
       chainId: 12227329,
       accounts: [PRIVATE_KEY, PRIVATE_KEY_1, PRIVATE_KEY_2],
       blockConfirmations: 2,
+    },
+    goerli: {
+      url: GOERLI_RPC_URL,
+      chainId: 5,
+      accounts: [PRIVATE_KEY, PRIVATE_KEY_1, PRIVATE_KEY_2],
+      blockConfirmations: 5,
     },
   },
   solidity: "0.8.20",

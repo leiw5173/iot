@@ -20,6 +20,14 @@ async function setPriceAndGoods() {
     deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
+  } else if (network.name == "goerli") {
+    console.log("Setting price and goods on goerli network");
+    iotContractAddr = process.env.GOERLI_CURRENCY_CONTRACT_ADDR;
+    exchangeContractAddr = process.env.GOERLI_EXCHANGE_CONTRACT_ADDR;
+    provider = new ethers.JsonRpcProvider(process.env.GOERLI_RPC_URL);
+    deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
+    bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
   } else {
     console.log("The network is not supported");
   }
@@ -28,7 +36,7 @@ async function setPriceAndGoods() {
     "Exchange",
     exchangeContractAddr
   );
-  await exchangeContract.connect(alice).setPriceAndGoods(1, 100);
+  // await exchangeContract.connect(alice).setPriceAndGoods(1, 100);
 
   console.log(await exchangeContract.connect(alice).orderNumber());
 
