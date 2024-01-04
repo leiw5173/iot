@@ -1,9 +1,9 @@
-const { ethers, network, getNamedAccounts } = require("hardhat");
+const { ethers, network } = require("hardhat");
 const { developmentChains } = require("../helper-hardhat-config");
 require("dotenv").config();
 
 async function setPriceAndGoods() {
-  let iotContractAddr, exchangeContractAddr, deployer, alice, bob, provider;
+  let exchangeContractAddr, deployer, alice, bob, provider, sleepTime;
   if (developmentChains.includes(network.name)) {
     console.log("Setting price and goods on development network");
     iotContractAddr = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
@@ -12,6 +12,7 @@ async function setPriceAndGoods() {
     deployer = accounts[0];
     alice = accounts[1];
     bob = accounts[2];
+    sleepTime = 1000;
   } else if (network.name == "neox") {
     console.log("Setting price and goods on neox network");
     iotContractAddr = process.env.IOT_CONTRACT_ADDR;
@@ -20,6 +21,7 @@ async function setPriceAndGoods() {
     deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
+    sleepTime = 6000;
   } else if (network.name == "goerli") {
     console.log("Setting price and goods on goerli network");
     iotContractAddr = process.env.GOERLI_CURRENCY_CONTRACT_ADDR;
@@ -28,6 +30,7 @@ async function setPriceAndGoods() {
     deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
+    sleepTime = 12000;
   } else {
     console.log("The network is not supported");
   }
@@ -36,7 +39,8 @@ async function setPriceAndGoods() {
     "Exchange",
     exchangeContractAddr
   );
-  // await exchangeContract.connect(alice).setPriceAndGoods(1, 100);
+  await exchangeContract.connect(alice).setPriceAndGoods(1, 100);
+  await sleep(sleepTime);
 
   console.log(await exchangeContract.connect(alice).orderNumber());
 
@@ -47,6 +51,11 @@ async function setPriceAndGoods() {
   console.log(`Price: ${order[2]}`);
   console.log(`Amount: ${order[3]}`);
   console.log(`Status: ${order[4]}`);
+}
+
+// Time deplay function
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 setPriceAndGoods()
