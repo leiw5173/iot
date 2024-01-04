@@ -75,6 +75,9 @@ contract Exchange {
             "The buyer does not have enough currency"
         );
         orders[_orderNumber].buyer = msg.sender;
+        
+        // Approve the exchange to transfer the currency 
+        currency.approve(address(this), orders[_orderNumber].price);
         currency.transferFrom(
             msg.sender,
             address(this),
