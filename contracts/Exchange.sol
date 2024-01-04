@@ -17,10 +17,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract Exchange {
     // The owner of the contract
-    address public owner;
+    address public immutable owner;
 
     // The currency that is used in the exchange
-    ERC20 public currency;
+    ERC20 public immutable currency;
 
     // Order number
     uint256 public orderNumber = 0;
@@ -75,6 +75,9 @@ contract Exchange {
             "The buyer does not have enough currency"
         );
         orders[_orderNumber].buyer = msg.sender;
+        
+        // Approve the exchange to transfer the currency 
+        currency.approve(address(this), orders[_orderNumber].price);
         currency.transferFrom(
             msg.sender,
             address(this),
