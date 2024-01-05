@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract Exchange {
     // The owner of the contract
-    address public immutable owner;
+    address private immutable owner;
 
     // The currency that is used in the exchange
     ERC20 public immutable currency;
@@ -58,11 +58,24 @@ contract Exchange {
         require(_price > 0, "The price should be greater than 0");
         require(_amount > 0, "The amount should be greater than 0");
         orders.push(
-            Order(address(0), msg.sender, _price, _amount, OrderStatus.Created)
+            Order(address(0), msg.sender, _price * 10**10, _amount, OrderStatus.Created)
         );
 
         emit OrderCreated(orderNumber);
         orderNumber++;
+    }
+
+    // The seller cancels the order
+    function cancelOrder(uint256 _orderNumber) public {
+        require(
+            orders[_orderNumber].seller == msg.sender,
+            "Only the seller can cancel the order"
+        );
+        require(
+            orders[_orderNumber].status == OrderStatus.Created,
+            "Order status is not Created or has been deposited"
+        );
+        orders[_orderNumber].status = OrderStatus.Cancelled;
     }
 
     // The buyer deposits the currency into the exchange
@@ -89,6 +102,22 @@ contract Exchange {
     }
 
     // The buyer recieves the goods and releases the currency to the seller
+    function cancelOrderByBuyer(uint256 _orderNumber) public {
+        require(
+            orders[_orderNumber].buyer == msg.sender,
+            "Only the buyer can cancel the order"
+        );
+        require(
+            orders[_orderNumber].status == OrderStatus.Deposited,
+            "Order status is not Deposited"
+        );
+        currency.transfer(
+            orders[_orderNumber].buyer,
+            orders[_orderNumber].price
+        );
+        orders[_orderNumber].status = OrderStatus.Cancelled;
+    }
+
     // need to check
     function receiveGoods(uint256 _orderNumber) public {
         require(
@@ -110,6 +139,8 @@ contract Exchange {
         orders[_orderNumber].status = OrderStatus.Finished;
         emit OrderFinished(_orderNumber);
     }
+
+    // The buyer cancels the order and gets the currency back
 
     function getOrder(
         uint256 _orderNumber
