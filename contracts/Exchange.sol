@@ -58,7 +58,7 @@ contract Exchange {
         require(_price > 0, "The price should be greater than 0");
         require(_amount > 0, "The amount should be greater than 0");
         orders.push(
-            Order(address(0), msg.sender, _price * 10**10, _amount, OrderStatus.Created)
+            Order(address(0), msg.sender, _price, _amount, OrderStatus.Created)
         );
 
         emit OrderCreated(orderNumber);
@@ -89,8 +89,6 @@ contract Exchange {
         );
         orders[_orderNumber].buyer = msg.sender;
         
-        // Approve the exchange to transfer the currency 
-        currency.approve(address(this), orders[_orderNumber].price);
         currency.transferFrom(
             msg.sender,
             address(this),
@@ -101,7 +99,7 @@ contract Exchange {
         orders[_orderNumber].status = OrderStatus.Deposited;
     }
 
-    // The buyer recieves the goods and releases the currency to the seller
+    // The buyer cancels the order and gets the currency back
     function cancelOrderByBuyer(uint256 _orderNumber) public {
         require(
             orders[_orderNumber].buyer == msg.sender,
