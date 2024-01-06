@@ -82,7 +82,10 @@ contract Exchange {
     // The buyer should be approved by the owner
     // The depositted currency should link to the order
     function depositCurrency(uint256 _orderNumber) public {
-        require(orders[_orderNumber].price != 0, "The order does not exist");
+        require(
+            orders[orderNumber].status == OrderStatus.Created,
+            "The order status should be created"
+        );
         require(
             currency.balanceOf(msg.sender) >= orders[_orderNumber].price,
             "The buyer does not have enough currency"
