@@ -88,7 +88,7 @@ contract Exchange {
             "The buyer does not have enough currency"
         );
         orders[_orderNumber].buyer = msg.sender;
-        
+
         currency.transferFrom(
             msg.sender,
             address(this),
