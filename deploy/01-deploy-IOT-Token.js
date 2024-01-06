@@ -45,8 +45,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
   // send tokens to alice and bob
   const iotContract = await ethers.getContractAt("Currency", iotToken.address);
-  await iotContract.connect(deployer).transfer(alice.address, 1000);
-  await iotContract.connect(deployer).transfer(bob.address, 1000);
+  await iotContract.connect(deployer).transfer(alice.address, 1000 * 10 ** 10);
+  await iotContract.connect(deployer).transfer(bob.address, 1000 * 10 ** 10);
   console.log("Transfered 1000 IOT Tokens to Alice and Bob");
   console.log(
     "Alice's balance: ",
