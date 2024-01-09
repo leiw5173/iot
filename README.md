@@ -1,13 +1,11 @@
-# Sample Hardhat Project
+# Smart Contract Addresses
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+## NeoX Network
 
-Try running some of the following tasks:
+- Currency: 0x8464135c8F25Da09e49BC8782676a84730C318bC
+- Exchange: 0x02B9d1100Ef04cb26044796e5909ad57FAE0B35D
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+## Goerli Network
+
+- Currency: 0xe2F84D7b2DB85B5700151012394B8BFd93681568
+- Exchange: 0x71d1574eCD520FCB10fa8189De134Ea42e222842
