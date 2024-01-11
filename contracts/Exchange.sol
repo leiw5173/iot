@@ -35,7 +35,6 @@ contract Exchange {
 
     // The order of the exchange
     struct Order {
-        uint256 orderId;
         address buyer;
         address seller;
         uint256 price;
@@ -59,7 +58,7 @@ contract Exchange {
         require(_price > 0, "The price should be greater than 0");
         require(_amount > 0, "The amount should be greater than 0");
         orders.push(
-            Order(orderNumber, address(0), msg.sender, _price, _amount, OrderStatus.Created)
+            Order(address(0), msg.sender, _price, _amount, OrderStatus.Created)
         );
 
         emit OrderCreated(orderNumber);
@@ -146,10 +145,9 @@ contract Exchange {
 
     function getOrder(
         uint256 _orderNumber
-    ) public view returns (uint256, address, address, uint256, uint256, OrderStatus) {
+    ) public view returns (address, address, uint256, uint256, OrderStatus) {
         Order memory order = orders[_orderNumber];
         return (
-            order.orderId,
             order.buyer,
             order.seller,
             order.price,
