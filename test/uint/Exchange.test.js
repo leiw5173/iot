@@ -27,8 +27,9 @@ const { developmentChains } = require("../../helper-hardhat-config");
       describe("Set Price and Goods", function () {
         it("Should set the price and goods", async function () {
           await exchange.connect(alice).setPriceAndGoods(1, 100);
-          const [buyer, seller, price, amount, status] =
+          const [orderId, buyer, seller, price, amount, status] =
             await exchange.getOrder(0);
+          assert.equal(orderId, 0);
           assert.equal(await exchange.orderNumber(), 1);
           assert.equal(seller, await alice.getAddress());
           assert.equal(price, 1);
@@ -70,7 +71,7 @@ const { developmentChains } = require("../../helper-hardhat-config");
             ).to.be.revertedWith("The buyer does not have enough currency");
           });
         });
-        describe("Deposit Currency", function () {
+        describe("Deposit Currency after Bob has enough currency", function () {
           beforeEach(async () => {
             await exchange.connect(alice).setPriceAndGoods(1, 100);
             await currency.connect(deployer).transfer(bob.getAddress(), 1000);
@@ -78,7 +79,7 @@ const { developmentChains } = require("../../helper-hardhat-config");
           });
           it("Should set bob as buyer and change status to 1 after deposit currency", async function () {
             await exchange.connect(bob).depositCurrency(0);
-            const [buyer, seller, price, amount, status] =
+            const [orderId, buyer, seller, price, amount, status] =
               await exchange.getOrder(0);
             assert.equal(buyer, await bob.getAddress());
             assert.equal(status, 1);

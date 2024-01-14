@@ -59,7 +59,14 @@ contract Exchange {
         require(_price > 0, "The price should be greater than 0");
         require(_amount > 0, "The amount should be greater than 0");
         orders.push(
-            Order(orderNumber, address(0), msg.sender, _price, _amount, OrderStatus.Created)
+            Order(
+                orderNumber,
+                address(0),
+                msg.sender,
+                _price,
+                _amount,
+                OrderStatus.Created
+            )
         );
 
         emit OrderCreated(orderNumber);
@@ -84,7 +91,7 @@ contract Exchange {
     // The depositted currency should link to the order
     function depositCurrency(uint256 _orderNumber) public {
         require(
-            orders[orderNumber].status == OrderStatus.Created,
+            orders[_orderNumber].status == OrderStatus.Created,
             "The order status should be created"
         );
         require(
@@ -146,7 +153,11 @@ contract Exchange {
 
     function getOrder(
         uint256 _orderNumber
-    ) public view returns (uint256, address, address, uint256, uint256, OrderStatus) {
+    )
+        public
+        view
+        returns (uint256, address, address, uint256, uint256, OrderStatus)
+    {
         Order memory order = orders[_orderNumber];
         return (
             order.orderId,
