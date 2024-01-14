@@ -48,6 +48,7 @@ contract Exchange {
     event OrderCreated(uint256 orderNumber);
     event OrderDeposited(uint256 orderNumber);
     event OrderFinished(uint256 orderNumber);
+    event OrderCanceled(uint256 orderNumber);
 
     constructor(ERC20 _currency) {
         owner = msg.sender;
@@ -74,7 +75,7 @@ contract Exchange {
     }
 
     // The seller cancels the order
-    function cancelOrder(uint256 _orderNumber) public {
+    function cancelOrderBySeller(uint256 _orderNumber) public {
         require(
             orders[_orderNumber].seller == msg.sender,
             "Only the seller can cancel the order"
@@ -84,6 +85,8 @@ contract Exchange {
             "Order status is not Created or has been deposited"
         );
         orders[_orderNumber].status = OrderStatus.Cancelled;
+        orders[_orderNumber].seller = address(0);
+        emit OrderCanceled(_orderNumber);
     }
 
     // The buyer deposits the currency into the exchange
