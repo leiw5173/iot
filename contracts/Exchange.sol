@@ -30,6 +30,7 @@ contract Exchange {
         Created,
         Deposited,
         Finished,
+        Updated,
         Cancelled
     }
 
@@ -48,6 +49,8 @@ contract Exchange {
     event OrderCreated(uint256 orderNumber);
     event OrderDeposited(uint256 orderNumber);
     event OrderFinished(uint256 orderNumber);
+    event OrderCanceled(uint256 orderNumber);
+    event OrderUpdated(uint256 orderNumber);
 
     constructor(ERC20 _currency) {
         owner = msg.sender;
@@ -59,15 +62,44 @@ contract Exchange {
         require(_price > 0, "The price should be greater than 0");
         require(_amount > 0, "The amount should be greater than 0");
         orders.push(
-            Order(orderNumber, address(0), msg.sender, _price, _amount, OrderStatus.Created)
+            Order(
+                orderNumber,
+                address(0),
+                msg.sender,
+                _price,
+                _amount,
+                OrderStatus.Created
+            )
         );
 
         emit OrderCreated(orderNumber);
         orderNumber++;
     }
 
+    // The seller updates the order
+    function updateOrder(
+        uint256 _orderNumber,
+        uint256 _price,
+        uint256 _amount
+    ) public {
+        require(
+            orders[_orderNumber].seller == msg.sender,
+            "Only the seller can update the order"
+        );
+        require(
+            orders[_orderNumber].status == OrderStatus.Created,
+            "Order status is not Created"
+        );
+        require(_price > 0, "The price should be greater than 0");
+        require(_amount > 0, "The amount should be greater than 0");
+        orders[_orderNumber].price = _price;
+        orders[_orderNumber].amount = _amount;
+        orders[_orderNumber].status = OrderStatus.Updated;
+        emit OrderUpdated(_orderNumber);
+    }
+
     // The seller cancels the order
-    function cancelOrder(uint256 _orderNumber) public {
+    function cancelOrderBySeller(uint256 _orderNumber) public {
         require(
             orders[_orderNumber].seller == msg.sender,
             "Only the seller can cancel the order"
@@ -77,6 +109,8 @@ contract Exchange {
             "Order status is not Created or has been deposited"
         );
         orders[_orderNumber].status = OrderStatus.Cancelled;
+        orders[_orderNumber].seller = address(0);
+        emit OrderCanceled(_orderNumber);
     }
 
     // The buyer deposits the currency into the exchange
@@ -84,8 +118,9 @@ contract Exchange {
     // The depositted currency should link to the order
     function depositCurrency(uint256 _orderNumber) public {
         require(
-            orders[orderNumber].status == OrderStatus.Created,
-            "The order status should be created"
+            orders[_orderNumber].status == OrderStatus.Created ||
+                orders[_orderNumber].status == OrderStatus.Updated,
+            "The order status should be created or updated"
         );
         require(
             currency.balanceOf(msg.sender) >= orders[_orderNumber].price,
@@ -103,24 +138,7 @@ contract Exchange {
         orders[_orderNumber].status = OrderStatus.Deposited;
     }
 
-    // The buyer cancels the order and gets the currency back
-    function cancelOrderByBuyer(uint256 _orderNumber) public {
-        require(
-            orders[_orderNumber].buyer == msg.sender,
-            "Only the buyer can cancel the order"
-        );
-        require(
-            orders[_orderNumber].status == OrderStatus.Deposited,
-            "Order status is not Deposited"
-        );
-        currency.transfer(
-            orders[_orderNumber].buyer,
-            orders[_orderNumber].price
-        );
-        orders[_orderNumber].status = OrderStatus.Cancelled;
-    }
-
-    // need to check
+    // Receive the goods and transfer the currency to the seller
     function receiveGoods(uint256 _orderNumber) public {
         require(
             currency.balanceOf(address(this)) >= orders[_orderNumber].price,
@@ -146,7 +164,11 @@ contract Exchange {
 
     function getOrder(
         uint256 _orderNumber
-    ) public view returns (uint256, address, address, uint256, uint256, OrderStatus) {
+    )
+        public
+        view
+        returns (uint256, address, address, uint256, uint256, OrderStatus)
+    {
         Order memory order = orders[_orderNumber];
         return (
             order.orderId,

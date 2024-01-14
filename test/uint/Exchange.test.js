@@ -27,8 +27,9 @@ const { developmentChains } = require("../../helper-hardhat-config");
       describe("Set Price and Goods", function () {
         it("Should set the price and goods", async function () {
           await exchange.connect(alice).setPriceAndGoods(1, 100);
-          const [buyer, seller, price, amount, status] =
+          const [orderId, buyer, seller, price, amount, status] =
             await exchange.getOrder(0);
+          assert.equal(orderId, 0);
           assert.equal(await exchange.orderNumber(), 1);
           assert.equal(seller, await alice.getAddress());
           assert.equal(price, 1);
@@ -55,6 +56,76 @@ const { developmentChains } = require("../../helper-hardhat-config");
           assert.equal(await exchange.orderNumber(), 1);
         });
       });
+      describe("Update order", function () {
+        beforeEach(async () => {
+          await exchange.connect(alice).setPriceAndGoods(1, 100);
+        });
+        it("Should revert if order does not exist", async function () {
+          await expect(exchange.connect(alice).updateOrder(1, 2, 200)).to.be
+            .reverted;
+        });
+        it("Should revert if sender is not seller", async function () {
+          await expect(
+            exchange.connect(bob).updateOrder(0, 2, 200)
+          ).to.be.revertedWith("Only the seller can update the order");
+        });
+        it("Should revert if status is not 0", async function () {
+          await currency.connect(deployer).transfer(bob.getAddress(), 1000);
+          await currency.connect(bob).approve(exchange, 1000);
+          await exchange.connect(bob).depositCurrency(0);
+          await expect(
+            exchange.connect(alice).updateOrder(0, 2, 200)
+          ).to.be.revertedWith("Order status is not Created");
+        });
+        it("Should emit OrderUpdated event", async function () {
+          await expect(exchange.connect(alice).updateOrder(0, 2, 200))
+            .to.emit(exchange, "OrderUpdated")
+            .withArgs(0);
+        });
+        it("Should update price, amount, and status", async function () {
+          await exchange.connect(alice).updateOrder(0, 2, 200);
+          const [orderId, buyer, seller, price, amount, status] =
+            await exchange.getOrder(0);
+          assert.equal(price, 2);
+          assert.equal(amount, 200);
+          assert.equal(status, 3);
+        });
+      });
+      describe("Cancel Order by Seller", function () {
+        beforeEach(async () => {
+          await exchange.connect(alice).setPriceAndGoods(1, 100);
+        });
+        it("Should revert if order does not exist", async function () {
+          await expect(exchange.connect(alice).cancelOrderBySeller(1)).to.be
+            .reverted;
+        });
+        it("Should revert if sender is not seller", async function () {
+          await expect(
+            exchange.connect(bob).cancelOrderBySeller(0)
+          ).to.be.revertedWith("Only the seller can cancel the order");
+        });
+        it("Should revert if status is not 0", async function () {
+          await currency.connect(deployer).transfer(bob.getAddress(), 1000);
+          await currency.connect(bob).approve(exchange, 1000);
+          await exchange.connect(bob).depositCurrency(0);
+          await expect(
+            exchange.connect(alice).cancelOrderBySeller(0)
+          ).to.be.revertedWith(
+            "Order status is not Created or has been deposited"
+          );
+        });
+        it("Should emit OrderCanceled event", async function () {
+          await expect(exchange.connect(alice).cancelOrderBySeller(0))
+            .to.emit(exchange, "OrderCanceled")
+            .withArgs(0);
+        });
+        it("Should set status to 3", async function () {
+          await exchange.connect(alice).cancelOrderBySeller(0);
+          const [orderId, buyer, seller, price, amount, status] =
+            await exchange.getOrder(0);
+          assert.equal(status, 4);
+        });
+      });
       describe("Deposit Currency", function () {
         describe("Bob don't have enough currency", function () {
           beforeEach(async () => {
@@ -70,7 +141,7 @@ const { developmentChains } = require("../../helper-hardhat-config");
             ).to.be.revertedWith("The buyer does not have enough currency");
           });
         });
-        describe("Deposit Currency", function () {
+        describe("Deposit Currency after Bob has enough currency", function () {
           beforeEach(async () => {
             await exchange.connect(alice).setPriceAndGoods(1, 100);
             await currency.connect(deployer).transfer(bob.getAddress(), 1000);
@@ -78,7 +149,7 @@ const { developmentChains } = require("../../helper-hardhat-config");
           });
           it("Should set bob as buyer and change status to 1 after deposit currency", async function () {
             await exchange.connect(bob).depositCurrency(0);
-            const [buyer, seller, price, amount, status] =
+            const [orderId, buyer, seller, price, amount, status] =
               await exchange.getOrder(0);
             assert.equal(buyer, await bob.getAddress());
             assert.equal(status, 1);
@@ -96,38 +167,37 @@ const { developmentChains } = require("../../helper-hardhat-config");
             assert.equal(balanceOfBobBefore - balanceOfBobAfter, 1);
           });
         });
-        describe("Receive Goods", function () {
-          beforeEach(async () => {
-            await exchange.connect(alice).setPriceAndGoods(1, 100);
-            await currency.connect(deployer).transfer(bob.getAddress(), 1000);
-            await currency.connect(bob).approve(exchange, 1000);
-            await exchange.connect(bob).depositCurrency(0);
-          });
-          it("Should revert if order does not exist", async function () {
-            await expect(exchange.connect(alice).receiveGoods(1)).to.be
-              .reverted;
-          });
-          it("Should revert if sender is not buyer", async function () {
-            await expect(
-              exchange.connect(alice).receiveGoods(0)
-            ).to.be.revertedWith("Only the buyer can receive the goods");
-          });
-          it("Should emit OrderFinished event", async function () {
-            await expect(exchange.connect(bob).receiveGoods(0))
-              .to.emit(exchange, "OrderFinished")
-              .withArgs(0);
-          });
-          it("Should send 1 IOT token to seller", async function () {
-            const balanceOfAliceBeore = await currency.balanceOf(
-              alice.getAddress()
-            );
-            await exchange.connect(bob).receiveGoods(0);
-            const balanceOfAliceAfter = await currency.balanceOf(
-              alice.getAddress()
-            );
-            assert.equal(await currency.balanceOf(exchange.getAddress()), 0);
-            assert.equal(balanceOfAliceAfter - balanceOfAliceBeore, 1);
-          });
+      });
+      describe("Receive Goods", function () {
+        beforeEach(async () => {
+          await exchange.connect(alice).setPriceAndGoods(1, 100);
+          await currency.connect(deployer).transfer(bob.getAddress(), 1000);
+          await currency.connect(bob).approve(exchange, 1000);
+          await exchange.connect(bob).depositCurrency(0);
+        });
+        it("Should revert if order does not exist", async function () {
+          await expect(exchange.connect(alice).receiveGoods(1)).to.be.reverted;
+        });
+        it("Should revert if sender is not buyer", async function () {
+          await expect(
+            exchange.connect(alice).receiveGoods(0)
+          ).to.be.revertedWith("Only the buyer can receive the goods");
+        });
+        it("Should emit OrderFinished event", async function () {
+          await expect(exchange.connect(bob).receiveGoods(0))
+            .to.emit(exchange, "OrderFinished")
+            .withArgs(0);
+        });
+        it("Should send 1 IOT token to seller", async function () {
+          const balanceOfAliceBeore = await currency.balanceOf(
+            alice.getAddress()
+          );
+          await exchange.connect(bob).receiveGoods(0);
+          const balanceOfAliceAfter = await currency.balanceOf(
+            alice.getAddress()
+          );
+          assert.equal(await currency.balanceOf(exchange.getAddress()), 0);
+          assert.equal(balanceOfAliceAfter - balanceOfAliceBeore, 1);
         });
       });
     });
