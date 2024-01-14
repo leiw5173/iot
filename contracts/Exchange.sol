@@ -30,6 +30,7 @@ contract Exchange {
         Created,
         Deposited,
         Finished,
+        Updated,
         Cancelled
     }
 
@@ -49,6 +50,7 @@ contract Exchange {
     event OrderDeposited(uint256 orderNumber);
     event OrderFinished(uint256 orderNumber);
     event OrderCanceled(uint256 orderNumber);
+    event OrderUpdated(uint256 orderNumber);
 
     constructor(ERC20 _currency) {
         owner = msg.sender;
@@ -74,6 +76,28 @@ contract Exchange {
         orderNumber++;
     }
 
+    // The seller updates the order
+    function updateOrder(
+        uint256 _orderNumber,
+        uint256 _price,
+        uint256 _amount
+    ) public {
+        require(
+            orders[_orderNumber].seller == msg.sender,
+            "Only the seller can update the order"
+        );
+        require(
+            orders[_orderNumber].status == OrderStatus.Created,
+            "Order status is not Created"
+        );
+        require(_price > 0, "The price should be greater than 0");
+        require(_amount > 0, "The amount should be greater than 0");
+        orders[_orderNumber].price = _price;
+        orders[_orderNumber].amount = _amount;
+        orders[_orderNumber].status = OrderStatus.Updated;
+        emit OrderUpdated(_orderNumber);
+    }
+
     // The seller cancels the order
     function cancelOrderBySeller(uint256 _orderNumber) public {
         require(
@@ -94,8 +118,9 @@ contract Exchange {
     // The depositted currency should link to the order
     function depositCurrency(uint256 _orderNumber) public {
         require(
-            orders[_orderNumber].status == OrderStatus.Created,
-            "The order status should be created"
+            orders[_orderNumber].status == OrderStatus.Created ||
+                orders[_orderNumber].status == OrderStatus.Updated,
+            "The order status should be created or updated"
         );
         require(
             currency.balanceOf(msg.sender) >= orders[_orderNumber].price,
