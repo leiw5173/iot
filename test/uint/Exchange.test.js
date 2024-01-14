@@ -56,6 +56,41 @@ const { developmentChains } = require("../../helper-hardhat-config");
           assert.equal(await exchange.orderNumber(), 1);
         });
       });
+      describe("Update order", function () {
+        beforeEach(async () => {
+          await exchange.connect(alice).setPriceAndGoods(1, 100);
+        });
+        it("Should revert if order does not exist", async function () {
+          await expect(exchange.connect(alice).updateOrder(1, 2, 200)).to.be
+            .reverted;
+        });
+        it("Should revert if sender is not seller", async function () {
+          await expect(
+            exchange.connect(bob).updateOrder(0, 2, 200)
+          ).to.be.revertedWith("Only the seller can update the order");
+        });
+        it("Should revert if status is not 0", async function () {
+          await currency.connect(deployer).transfer(bob.getAddress(), 1000);
+          await currency.connect(bob).approve(exchange, 1000);
+          await exchange.connect(bob).depositCurrency(0);
+          await expect(
+            exchange.connect(alice).updateOrder(0, 2, 200)
+          ).to.be.revertedWith("Order status is not Created");
+        });
+        it("Should emit OrderUpdated event", async function () {
+          await expect(exchange.connect(alice).updateOrder(0, 2, 200))
+            .to.emit(exchange, "OrderUpdated")
+            .withArgs(0);
+        });
+        it("Should update price, amount, and status", async function () {
+          await exchange.connect(alice).updateOrder(0, 2, 200);
+          const [orderId, buyer, seller, price, amount, status] =
+            await exchange.getOrder(0);
+          assert.equal(price, 2);
+          assert.equal(amount, 200);
+          assert.equal(status, 3);
+        });
+      });
       describe("Cancel Order by Seller", function () {
         beforeEach(async () => {
           await exchange.connect(alice).setPriceAndGoods(1, 100);
@@ -88,7 +123,7 @@ const { developmentChains } = require("../../helper-hardhat-config");
           await exchange.connect(alice).cancelOrderBySeller(0);
           const [orderId, buyer, seller, price, amount, status] =
             await exchange.getOrder(0);
-          assert.equal(status, 3);
+          assert.equal(status, 4);
         });
       });
       describe("Deposit Currency", function () {
