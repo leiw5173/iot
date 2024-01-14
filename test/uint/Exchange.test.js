@@ -132,38 +132,37 @@ const { developmentChains } = require("../../helper-hardhat-config");
             assert.equal(balanceOfBobBefore - balanceOfBobAfter, 1);
           });
         });
-        describe("Receive Goods", function () {
-          beforeEach(async () => {
-            await exchange.connect(alice).setPriceAndGoods(1, 100);
-            await currency.connect(deployer).transfer(bob.getAddress(), 1000);
-            await currency.connect(bob).approve(exchange, 1000);
-            await exchange.connect(bob).depositCurrency(0);
-          });
-          it("Should revert if order does not exist", async function () {
-            await expect(exchange.connect(alice).receiveGoods(1)).to.be
-              .reverted;
-          });
-          it("Should revert if sender is not buyer", async function () {
-            await expect(
-              exchange.connect(alice).receiveGoods(0)
-            ).to.be.revertedWith("Only the buyer can receive the goods");
-          });
-          it("Should emit OrderFinished event", async function () {
-            await expect(exchange.connect(bob).receiveGoods(0))
-              .to.emit(exchange, "OrderFinished")
-              .withArgs(0);
-          });
-          it("Should send 1 IOT token to seller", async function () {
-            const balanceOfAliceBeore = await currency.balanceOf(
-              alice.getAddress()
-            );
-            await exchange.connect(bob).receiveGoods(0);
-            const balanceOfAliceAfter = await currency.balanceOf(
-              alice.getAddress()
-            );
-            assert.equal(await currency.balanceOf(exchange.getAddress()), 0);
-            assert.equal(balanceOfAliceAfter - balanceOfAliceBeore, 1);
-          });
+      });
+      describe("Receive Goods", function () {
+        beforeEach(async () => {
+          await exchange.connect(alice).setPriceAndGoods(1, 100);
+          await currency.connect(deployer).transfer(bob.getAddress(), 1000);
+          await currency.connect(bob).approve(exchange, 1000);
+          await exchange.connect(bob).depositCurrency(0);
+        });
+        it("Should revert if order does not exist", async function () {
+          await expect(exchange.connect(alice).receiveGoods(1)).to.be.reverted;
+        });
+        it("Should revert if sender is not buyer", async function () {
+          await expect(
+            exchange.connect(alice).receiveGoods(0)
+          ).to.be.revertedWith("Only the buyer can receive the goods");
+        });
+        it("Should emit OrderFinished event", async function () {
+          await expect(exchange.connect(bob).receiveGoods(0))
+            .to.emit(exchange, "OrderFinished")
+            .withArgs(0);
+        });
+        it("Should send 1 IOT token to seller", async function () {
+          const balanceOfAliceBeore = await currency.balanceOf(
+            alice.getAddress()
+          );
+          await exchange.connect(bob).receiveGoods(0);
+          const balanceOfAliceAfter = await currency.balanceOf(
+            alice.getAddress()
+          );
+          assert.equal(await currency.balanceOf(exchange.getAddress()), 0);
+          assert.equal(balanceOfAliceAfter - balanceOfAliceBeore, 1);
         });
       });
     });

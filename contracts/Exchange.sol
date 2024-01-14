@@ -113,24 +113,7 @@ contract Exchange {
         orders[_orderNumber].status = OrderStatus.Deposited;
     }
 
-    // The buyer cancels the order and gets the currency back
-    function cancelOrderByBuyer(uint256 _orderNumber) public {
-        require(
-            orders[_orderNumber].buyer == msg.sender,
-            "Only the buyer can cancel the order"
-        );
-        require(
-            orders[_orderNumber].status == OrderStatus.Deposited,
-            "Order status is not Deposited"
-        );
-        currency.transfer(
-            orders[_orderNumber].buyer,
-            orders[_orderNumber].price
-        );
-        orders[_orderNumber].status = OrderStatus.Cancelled;
-    }
-
-    // need to check
+    // Receive the goods and transfer the currency to the seller
     function receiveGoods(uint256 _orderNumber) public {
         require(
             currency.balanceOf(address(this)) >= orders[_orderNumber].price,
