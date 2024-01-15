@@ -7,6 +7,7 @@ const { developmentChains } = require("../../helper-hardhat-config");
 !developmentChains.includes(network.name)
   ? describe.skip
   : describe("Exchange", async () => {
+      const mutipler = 10 ** 10;
       let exchange, deployer, alice, bob;
       let currency;
       beforeEach(async () => {
@@ -31,6 +32,7 @@ const { developmentChains } = require("../../helper-hardhat-config");
             await exchange.getOrder(0);
           assert.equal(orderId, 0);
           assert.equal(await exchange.orderNumber(), 1);
+          assert.equal(orderId, 0);
           assert.equal(seller, await alice.getAddress());
           assert.equal(price, 1);
           assert.equal(amount, 100);
@@ -136,6 +138,8 @@ const { developmentChains } = require("../../helper-hardhat-config");
               .reverted;
           });
           it("Should revert if bob don't have enough currency", async function () {
+            const orderNumber = await exchange.orderNumber();
+            console.log(orderNumber);
             await expect(
               exchange.connect(bob).depositCurrency(0)
             ).to.be.revertedWith("The buyer does not have enough currency");
