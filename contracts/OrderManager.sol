@@ -64,7 +64,6 @@ contract Exchange {
         orders.push(Order(orderNumber, address(0), OrderStatus.Created));
 
         emit OrderCreated(orderNumber);
-        orderNumber++;
     }
 
     // The seller updates the order
