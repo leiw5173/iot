@@ -18,12 +18,6 @@ contract ProductManager {
         uint price,
         bool purchased
     );
-    event ProductPurchased(
-        uint id,
-        string name,
-        uint price,
-        bool purchased
-    );
 
     function createProduct(string memory _name, uint _price) public {
         require(bytes(_name).length > 0, "Product name cannot be empty");
@@ -53,21 +47,6 @@ contract ProductManager {
         require(_id > 0 && _id <= productCount, "Invalid product id");
         Product memory product = products[_id];
         return (
-            product.id,
-            product.name,
-            product.price,
-            product.purchased
-        );
-    }
-
-    function purchaseProduct(uint _id) public {
-        require(_id > 0 && _id <= productCount, "Invalid product id");
-        Product memory product = products[_id];
-        require(!product.purchased, "Product already purchased");
-        product.purchased = true;
-        products[_id] = product;
-
-        emit ProductPurchased(
             product.id,
             product.name,
             product.price,
