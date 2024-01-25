@@ -15,17 +15,18 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./Interfaces/IProductManager.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-contract Exchange {
+contract Exchange is Initializable {
     // The owner of the contract
-    address private immutable owner;
+    address private  owner;
 
     // Smart contract for product management and currency
-    ERC20 public immutable currency;
-    IProductManager public immutable productManager;
+    ERC20 public  currency;
+    IProductManager public  productManager;
 
     // Order number
-    uint256 public orderNumber = 0;
+    uint256 public orderNumber;
 
     // Order Status enum
     enum OrderStatus {
@@ -39,10 +40,11 @@ contract Exchange {
     // The order of the exchange
     struct Order {
         uint256 orderId;
+        address seller;
         address buyer;
         OrderStatus status;
     }
-    Order[] public orders;
+    mapping(uint256 => Order) public orders;
 
     // Events
     event OrderCreated(uint256 orderNumber);
@@ -51,17 +53,18 @@ contract Exchange {
     event OrderCanceled(uint256 orderNumber);
     event OrderUpdated(uint256 orderNumber);
 
-    constructor(ERC20 _currency, address _productManager) {
+    function initialize(ERC20 _currency, address _productManager) public initializer {
         owner = msg.sender;
         currency = _currency;
         productManager = IProductManager(_productManager);
+        orderNumber = 0;
     }
 
     // The seller set the price of the goods and the amount of goods
     function setPriceAndGoods(string memory _name, uint256 _price) public {
         productManager.createProduct(_name, _price);
         orderNumber++;
-        orders.push(Order(orderNumber, address(0), OrderStatus.Created));
+        orders[orderNumber] = Order(orderNumber,msg.sender, address(0), OrderStatus.Created);
 
         emit OrderCreated(orderNumber);
     }
@@ -72,8 +75,7 @@ contract Exchange {
         string memory _name,
         uint256 _price
     ) public {
-        (, , , address seller, ) = productManager.getProduct(_orderNumber);
-        require(seller == msg.sender, "Only the seller can update the order");
+        require(orders[_orderNumber].seller == msg.sender, "Only the seller can update the order");
         require(
             orders[_orderNumber].status == OrderStatus.Created,
             "Order status is not Created"
@@ -88,8 +90,7 @@ contract Exchange {
 
     // The seller cancels the order
     function cancelOrderBySeller(uint256 _orderNumber) public {
-        (, , , address seller, ) = productManager.getProduct(_orderNumber);
-        require(seller == msg.sender, "Only the seller can cancel the order");
+        require(orders[_orderNumber].seller == msg.sender, "Only the seller can cancel the order");
         require(
             orders[_orderNumber].status == OrderStatus.Created,
             "Order status is not Created or has been deposited"
@@ -103,7 +104,7 @@ contract Exchange {
     // The buyer should be approved by the owner
     // The depositted currency should link to the order
     function depositCurrency(uint256 _orderNumber) public {
-        (, , uint256 price, , ) = productManager.getProduct(_orderNumber);
+        (, , uint256 price , ) = productManager.getProduct(_orderNumber);
         require(
             orders[_orderNumber].status == OrderStatus.Created ||
                 orders[_orderNumber].status == OrderStatus.Updated,
@@ -123,7 +124,7 @@ contract Exchange {
 
     // Receive the goods and transfer the currency to the seller
     function receiveGoods(uint256 _orderNumber) public {
-        (, , uint256 price, address seller, ) = productManager.getProduct(
+        (, , uint256 price,  ) = productManager.getProduct(
             _orderNumber
         );
         require(
@@ -138,7 +139,7 @@ contract Exchange {
             orders[_orderNumber].status == OrderStatus.Deposited,
             "Order status is not Deposited"
         );
-        currency.transfer(seller, price);
+        currency.transfer(orders[_orderNumber].seller, price);
         orders[_orderNumber].status = OrderStatus.Finished;
         emit OrderFinished(_orderNumber);
     }
@@ -152,9 +153,9 @@ contract Exchange {
         view
         returns (uint256, address, address, uint256, string memory, OrderStatus)
     {
-        (, string memory name, uint256 price, address seller, ) = productManager
+        (, string memory name, uint256 price,  ) = productManager
             .getProduct(_orderNumber);
         Order memory order = orders[_orderNumber];
-        return (order.orderId, order.buyer, seller, price, name, order.status);
+        return (order.orderId, order.buyer, orders[_orderNumber].seller, price, name, order.status);
     }
 }

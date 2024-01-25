@@ -6,7 +6,6 @@ contract ProductManager {
         uint id;
         string name;
         uint price;
-        address seller;
         bool purchased;
     }
 
@@ -17,14 +16,6 @@ contract ProductManager {
         uint id,
         string name,
         uint price,
-        address seller,
-        bool purchased
-    );
-    event ProductPurchased(
-        uint id,
-        string name,
-        uint price,
-        address seller,
         bool purchased
     );
 
@@ -36,10 +27,9 @@ contract ProductManager {
             productCount,
             _name,
             _price,
-            msg.sender,
             false
         );
-        emit ProductCreated(productCount, _name, _price, msg.sender, false);
+        emit ProductCreated(productCount, _name, _price, false);
     }
 
     function getProduct(
@@ -51,7 +41,6 @@ contract ProductManager {
             uint id,
             string memory name,
             uint price,
-            address seller,
             bool purchased
         )
     {
@@ -61,27 +50,6 @@ contract ProductManager {
             product.id,
             product.name,
             product.price,
-            product.seller,
-            product.purchased
-        );
-    }
-
-    function purchaseProduct(uint _id) public {
-        require(_id > 0 && _id <= productCount, "Invalid product id");
-        Product memory product = products[_id];
-        require(!product.purchased, "Product already purchased");
-        require(
-            product.seller != msg.sender,
-            "Cannot purchase your own product"
-        );
-        product.purchased = true;
-        products[_id] = product;
-
-        emit ProductPurchased(
-            product.id,
-            product.name,
-            product.price,
-            product.seller,
             product.purchased
         );
     }
@@ -89,7 +57,6 @@ contract ProductManager {
     function updateProduct(uint _id, string memory _name, uint _price) public {
         require(_id > 0 && _id <= productCount, "Invalid product id");
         Product memory product = products[_id];
-        require(product.seller == msg.sender, "Only seller can update product");
         require(!product.purchased, "Cannot update purchased product");
         require(bytes(_name).length > 0, "Product name cannot be empty");
         require(_price > 0, "Product price cannot be zero");
@@ -100,7 +67,6 @@ contract ProductManager {
             product.id,
             product.name,
             product.price,
-            product.seller,
             product.purchased
         );
     }
@@ -108,7 +74,6 @@ contract ProductManager {
     function deleteProduct(uint _id) public {
         require(_id > 0 && _id <= productCount, "Invalid product id");
         Product memory product = products[_id];
-        require(product.seller == msg.sender, "Only seller can delete product");
         require(!product.purchased, "Cannot delete purchased product");
         delete products[_id];
     }

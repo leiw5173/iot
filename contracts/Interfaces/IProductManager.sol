@@ -6,7 +6,7 @@ interface IProductManager {
 
     function getProduct(
         uint256 _id
-    ) external view returns (uint256, string memory, uint256, address, bool);
+    ) external view returns (uint256, string memory, uint256, bool);
 
     function purchaseProduct(uint256 _id) external;
 
