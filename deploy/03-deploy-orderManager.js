@@ -1,41 +1,43 @@
 // Deploy Exchange contract
-const { ethers, network } = require("hardhat");
+const { ethers, network, upgrades } = require("hardhat");
 const { developmentChains } = require("../helper-hardhat-config");
 require("dotenv").config();
 
-module.exports = async function ({ deployments, getNamedAccounts }) {
-  const { deploy, log } = deployments;
+module.exports = async function ({ deployments, getNamedAccounts, ethers }) {
+  const { log } = deployments;
   const PRIVATE_KEY = process.env.PRIVATE_KEY;
   const NEOX_RPC_URL = process.env.NEOX_RPC_URL;
   const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL;
 
-  let deployerAddr, IOTAddr;
+  let deployer, deployerAddr, IOTAddr, productManagerAddr;
   if (developmentChains.includes(network.name)) {
-    const { deployer } = await getNamedAccounts();
+    deployer = (await getNamedAccounts()).deployer;
     deployerAddr = deployer;
-    IOTAddr = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+    IOTAddr = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    productManagerAddr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
     log("Local network detected! Deploying on Hardhat network.");
   } else if (network.name === "neox") {
     const provider = new ethers.JsonRpcProvider(NEOX_RPC_URL);
-    const deployer = new ethers.Wallet(PRIVATE_KEY, provider);
+    deployer = new ethers.Wallet(PRIVATE_KEY, provider);
     deployerAddr = deployer.address;
     IOTAddr = process.env.IOT_CONTRACT_ADDR;
     log("Neox network detected! Deploying on Neox testnet.");
   } else if (network.name === "goerli") {
     const provider = new ethers.JsonRpcProvider(GOERLI_RPC_URL);
-    const deployer = new ethers.Wallet(PRIVATE_KEY, provider);
+    deployer = new ethers.Wallet(PRIVATE_KEY, provider);
     deployerAddr = deployer.address;
     IOTAddr = process.env.IOT_CONTRACT_ADDR;
     log("Goerli network detected! Deploying on Goerli testnet.");
   }
 
   console.log("Deploying Exchange with account:", deployerAddr);
-  await deploy("Exchange", {
-    from: deployerAddr,
-    args: [IOTAddr],
-    log: true,
-    waitConfirmations: 1,
-  });
+  const Exchange = await ethers.getContractFactory("Exchange");
+  const proxy = await upgrades.deployProxy(
+    Exchange,
+    [IOTAddr, productManagerAddr],
+    { deployer, initializer: "initialize", kind: "transparent" }
+  );
+  console.log("Exchange deployed to:", await proxy.getAddress());
 };
 
 module.exports.tags = ["Exchange", "all"];
