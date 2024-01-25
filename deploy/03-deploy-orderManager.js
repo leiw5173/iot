@@ -26,7 +26,8 @@ module.exports = async function ({ deployments, getNamedAccounts, ethers }) {
     const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
     deployer = new ethers.Wallet(PRIVATE_KEY, provider);
     deployerAddr = deployer.address;
-    IOTAddr = process.env.IOT_CONTRACT_ADDR;
+    IOTAddr = process.env.SEPOLIA_CURRENCY_CONTRACT_ADDR;
+    productManagerAddr = process.env.SEPOLIA_PRODUCT_CONTRACT_ADDR;
     log("Sepolia network detected! Deploying on Sepolia testnet.");
   }
 
@@ -37,7 +38,7 @@ module.exports = async function ({ deployments, getNamedAccounts, ethers }) {
     [IOTAddr, productManagerAddr],
     { deployer, initializer: "initialize", kind: "transparent" }
   );
-  console.log("Exchange deployed to:", await proxy.getAddress());
+  console.log("OrderManager deployed to:", await proxy.getAddress());
 };
 
-module.exports.tags = ["Exchange", "all"];
+module.exports.tags = ["OrderManager", "all"];
