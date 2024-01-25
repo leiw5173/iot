@@ -7,6 +7,7 @@ require("hardhat-deploy");
 
 const NEOX_RPC_URL = process.env.NEOX_RPC_URL;
 const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL;
+const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const PRIVATE_KEY_1 = process.env.PRIVATE_KEY_1;
 const PRIVATE_KEY_2 = process.env.PRIVATE_KEY_2;
@@ -34,6 +35,14 @@ module.exports = {
       blockConfirmations: 5,
       gas: 12000000,
       gasPrice: 1000000000000,
+    },
+    sepolia: {
+      url: SEPOLIA_RPC_URL,
+      chainId: 11155111,
+      accounts: [PRIVATE_KEY, PRIVATE_KEY_1, PRIVATE_KEY_2],
+      blockConfirmations: 5,
+      // gas: 12000000,
+      // gasPrice: 1000000000000,
     },
   },
   solidity: "0.8.20",

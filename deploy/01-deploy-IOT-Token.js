@@ -9,7 +9,7 @@ require("dotenv").config();
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const PRIVATE_KEY = process.env.PRIVATE_KEY;
   const NEOX_RPC_URL = process.env.NEOX_RPC_URL;
-  const GOERLI_RPC_URL = process.env.GOERLI_RPC_URL;
+  const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
   const { deploy } = deployments;
   let deployer, alice, bob, provider;
 
@@ -24,8 +24,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     deployer = new ethers.Wallet(PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
-  } else if (network.name == "goerli") {
-    const provider = new ethers.JsonRpcProvider(GOERLI_RPC_URL);
+  } else if (network.name == "sepolia") {
+    const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
     deployer = new ethers.Wallet(PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
