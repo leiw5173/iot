@@ -47,6 +47,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const iotContract = await ethers.getContractAt("Currency", iotToken.address);
   await iotContract.connect(deployer).transfer(alice.address, 1000 * 10 ** 10);
   await iotContract.connect(deployer).transfer(bob.address, 1000 * 10 ** 10);
+  await sleep(11000);
+
   console.log("Transfered 1000 IOT Tokens to Alice and Bob");
   console.log(
     "Alice's balance: ",
@@ -57,5 +59,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     (await iotContract.balanceOf(bob.address)).toString()
   );
 };
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 module.exports.tags = ["Currency", "all"];

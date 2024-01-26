@@ -10,8 +10,7 @@ async function receiveGoods() {
     bob,
     provider,
     sleepTime;
-  const orderNumber = 0;
-  const multiplier = 10 ** 10;
+  const orderNumber = 1;
   if (developmentChains.includes(network.name)) {
     console.log("Receiving goods on development network");
     iotContractAddr = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
@@ -30,11 +29,11 @@ async function receiveGoods() {
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
     sleepTime = 5000; // wait for 5 seconds for mining
-  } else if (network.name == "goerli") {
-    console.log("Receiving goods on goerli network");
-    iotContractAddr = process.env.GOERLI_CURRENCY_CONTRACT_ADDR;
-    exchangeContractAddr = process.env.GOERLI_EXCHANGE_CONTRACT_ADDR;
-    provider = new ethers.JsonRpcProvider(process.env.GOERLI_RPC_URL);
+  } else if (network.name == "sepolia") {
+    console.log("Receiving goods on Sepolia network");
+    iotContractAddr = process.env.SEPOLIA_CURRENCY_CONTRACT_ADDR;
+    exchangeContractAddr = process.env.SEPOLIA_EXCHANGE_CONTRACT_ADDR;
+    provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
     deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
@@ -63,7 +62,7 @@ async function receiveGoods() {
 
   // check the status of the order
   const order = await exchangeContract.getOrder(orderNumber);
-  console.log(`Order status: ${order[4]}`);
+  console.log(`Order status: ${order[5]}`);
 }
 
 // Time deplay function

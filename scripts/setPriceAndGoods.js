@@ -22,12 +22,12 @@ async function setPriceAndGoods() {
     deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
-    sleepTime = 6000;
-  } else if (network.name == "goerli") {
+    sleepTime = 12000;
+  } else if (network.name == "sepolia") {
     console.log("Setting price and goods on goerli network");
-    iotContractAddr = process.env.GOERLI_CURRENCY_CONTRACT_ADDR;
-    exchangeContractAddr = process.env.GOERLI_EXCHANGE_CONTRACT_ADDR;
-    provider = new ethers.JsonRpcProvider(process.env.GOERLI_RPC_URL);
+    iotContractAddr = process.env.SEPOLIA_CURRENCY_CONTRACT_ADDR;
+    exchangeContractAddr = process.env.SEPOLIA_EXCHANGE_CONTRACT_ADDR;
+    provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
     deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
@@ -42,19 +42,21 @@ async function setPriceAndGoods() {
   );
   const tx = await exchangeContract
     .connect(alice)
-    .setPriceAndGoods(1 * multiplier, 100);
+    .setPriceAndGoods("100 Stones", 1 * multiplier);
   await tx.wait();
   await sleep(sleepTime);
 
   console.log(await exchangeContract.connect(alice).orderNumber());
 
-  const order = await exchangeContract.connect(alice).getOrder(0);
+  const order = await exchangeContract.connect(alice).getOrder(1);
   console.log(order);
 
-  console.log(`Seller: ${order[1]}`);
-  console.log(`Price: ${order[2]}`);
-  console.log(`Amount: ${order[3]}`);
-  console.log(`Status: ${order[4]}`);
+  console.log(`OrderID: ${order[0]}`);
+  console.log(`Buyer: ${order[1]}`);
+  console.log(`Seller: ${order[2]}`);
+  console.log(`Price: ${order[3]}`);
+  console.log(`Name: ${order[4]}`);
+  console.log(`Status: ${order[5]}`);
 }
 
 // Time deplay function

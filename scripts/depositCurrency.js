@@ -4,7 +4,7 @@ require("dotenv").config();
 
 async function depositCurrency() {
   let iotContractAddr, exchangeContractAddr, deployer, alice, bob, provider;
-  const orderNumber = 0;
+  const orderNumber = 1;
   const multiplier = 10 ** 10;
   if (developmentChains.includes(network.name)) {
     console.log("Setting price and goods on development network");
@@ -22,11 +22,11 @@ async function depositCurrency() {
     deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
-  } else if (network.name == "goerli") {
-    console.log("Deposit currency on goerli network");
-    iotContractAddr = process.env.GOERLI_CURRENCY_CONTRACT_ADDR;
-    exchangeContractAddr = process.env.GOERLI_EXCHANGE_CONTRACT_ADDR;
-    provider = new ethers.JsonRpcProvider(process.env.GOERLI_RPC_URL);
+  } else if (network.name == "sepolia") {
+    console.log("Deposit currency on Sepolia network");
+    iotContractAddr = process.env.SEPOLIA_CURRENCY_CONTRACT_ADDR;
+    exchangeContractAddr = process.env.SEPOLIA_EXCHANGE_CONTRACT_ADDR;
+    provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
     deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
     alice = new ethers.Wallet(process.env.PRIVATE_KEY_1, provider);
     bob = new ethers.Wallet(process.env.PRIVATE_KEY_2, provider);
@@ -45,8 +45,8 @@ async function depositCurrency() {
   await iotContract.connect(bob).approve(exchangeContractAddr, 1 * multiplier);
 
   const orderBefore = await exchangeContract.getOrder(orderNumber);
-  console.log(orderBefore);
-  console.log(`Price: ${orderBefore[2]}`);
+  console.log(`Order before: ${orderBefore}`);
+  console.log(`Price: ${orderBefore[3]}`);
 
   const response = await exchangeContract
     .connect(bob)
@@ -54,10 +54,17 @@ async function depositCurrency() {
 
   // console.log(response);
 
-  const order = await exchangeContract.getOrder(orderNumber);
-  console.log(order);
+  await sleep(12000);
 
-  console.log(`Buyer: ${order[orderNumber]}`);
+  const order = await exchangeContract.getOrder(orderNumber);
+  console.log(`Order After: ${order}`);
+
+  console.log(`Buyer: ${order[1]}`);
+}
+
+// Time deplay function
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 depositCurrency()
