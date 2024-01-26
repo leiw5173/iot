@@ -22,11 +22,11 @@ module.exports = {
     },
     neox: {
       url: NEOX_RPC_URL,
-      chainId: 12227329,
+      chainId: 12227330,
       accounts: [PRIVATE_KEY, PRIVATE_KEY_1, PRIVATE_KEY_2],
       blockConfirmations: 2,
-      gas: 12000000,
-      gasPrice: 1000000000000,
+      gas: 25e6,
+      gasPrice: 20e9,
     },
     goerli: {
       url: GOERLI_RPC_URL,
