@@ -21,6 +21,7 @@ module.exports = async function ({ deployments, getNamedAccounts, ethers }) {
     deployer = new ethers.Wallet(PRIVATE_KEY, provider);
     deployerAddr = deployer.address;
     IOTAddr = process.env.IOT_CONTRACT_ADDR;
+    productManagerAddr = process.env.PRODUCT_CONTRACT_ADDR;
     log("Neox network detected! Deploying on Neox testnet.");
   } else if (network.name === "sepolia") {
     const provider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
