@@ -2,7 +2,7 @@ const { ethers, network } = require("hardhat");
 const { developmentChains } = require("../helper-hardhat-config");
 require("dotenv").config();
 
-async function checkBalance() {
+async function getOrder() {
   let iotContractAddr, exchangeContractAddr, deployer, alice, bob, provider;
   if (developmentChains.includes(network.name)) {
     console.log("Checking balances on development network");
@@ -32,12 +32,21 @@ async function checkBalance() {
     console.log("The network is not supported");
   }
 
-  const iotContract = await ethers.getContractAt("Currency", iotContractAddr);
-  const bobBalance = await iotContract.balanceOf(bob.address);
-  console.log(`Bob's balance: ${bobBalance}`);
+  const orderContract = await ethers.getContractAt(
+    "Exchange",
+    exchangeContractAddr
+  );
+  order = await orderContract.getOrder(1);
+
+  console.log(`OrderID: ${order[0]}`);
+  console.log(`Buyer: ${order[1]}`);
+  console.log(`Seller: ${order[2]}`);
+  console.log(`Price: ${order[3]}`);
+  console.log(`Name: ${order[4]}`);
+  console.log(`Status: ${order[5]}`);
 }
 
-checkBalance()
+getOrder()
   .then(() => process.exit(0))
   .catch((error) => {
     console.log(error);
