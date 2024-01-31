@@ -36,7 +36,7 @@ async function getOrder() {
     "Exchange",
     exchangeContractAddr
   );
-  order = await orderContract.getOrder(1);
+  order = await orderContract.getOrder(process.env.ORDER_ID);
 
   console.log(`OrderID: ${order[0]}`);
   console.log(`Buyer: ${order[1]}`);
