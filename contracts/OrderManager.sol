@@ -46,6 +46,15 @@ contract Exchange is Initializable {
     }
     mapping(uint256 => Order) public orders;
 
+    struct OrderInfo {
+    uint256 orderId;
+    address buyer;
+    address seller;
+    uint256 price;
+    string name;
+    OrderStatus status;
+}
+
     // Events
     event OrderCreated(uint256 orderNumber);
     event OrderDeposited(uint256 orderNumber);
@@ -151,11 +160,26 @@ contract Exchange is Initializable {
     )
         public
         view
-        returns (uint256, address, address, uint256, string memory, OrderStatus)
+        returns (OrderInfo memory)
     {
         (, string memory name, uint256 price,  ) = productManager
             .getProduct(_orderNumber);
         Order memory order = orders[_orderNumber];
-        return (order.orderId, order.buyer, orders[_orderNumber].seller, price, name, order.status);
+        return OrderInfo({
+        orderId: order.orderId,
+        buyer: order.buyer,
+        seller: orders[_orderNumber].seller,
+        price: price,
+        name: name,
+        status: order.status
+    });
+    }
+
+    function getOrders() public view returns (OrderInfo[] memory) {
+        OrderInfo[] memory _orders = new OrderInfo[](orderNumber);
+        for (uint256 i = 0; i < orderNumber; i++) {
+            _orders[i] = getOrder(i + 1);
+        }
+        return _orders;
     }
 }
