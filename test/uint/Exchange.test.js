@@ -212,4 +212,31 @@ const { encodeBytes32String } = require("ethers");
           assert.equal(balanceOfAliceAfter - balanceOfAliceBeore, 1);
         });
       });
+      describe("Get Orders", function () {
+        beforeEach(async () => {
+          await proxy.connect(alice).setPriceAndGoods("100 Stones", 1);
+          await proxy.connect(alice).setPriceAndGoods("200 Stones", 2);
+          await currency.connect(deployer).transfer(bob.getAddress(), 1000);
+          await currency.connect(bob).approve(proxy, 1000);
+          await proxy.connect(bob).depositCurrency(1);
+        });
+        it("Should return all orders", async function () {
+          const orders = await proxy.getOrders();
+          const [orderId1, buyer1, seller1, price1, name1, status1] = orders[0];
+          const [orderId2, buyer2, seller2, price2, name2, status2] = orders[1];
+          assert.equal(orders.length, 2);
+          assert.equal(orderId1, 1);
+          assert.equal(buyer1, await bob.getAddress());
+          assert.equal(seller1, await alice.getAddress());
+          assert.equal(price1, 1);
+          assert.equal(name1, "100 Stones");
+          assert.equal(status1, 1);
+          assert.equal(orderId2, 2);
+          assert.equal(buyer2, ethers.ZeroAddress);
+          assert.equal(seller2, await alice.getAddress());
+          assert.equal(price2, 2);
+          assert.equal(name2, "200 Stones");
+          assert.equal(status2, 0);
+        });
+      });
     });
