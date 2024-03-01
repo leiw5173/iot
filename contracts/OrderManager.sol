@@ -86,8 +86,8 @@ contract Exchange is Initializable {
     ) public {
         require(orders[_orderNumber].seller == msg.sender, "Only the seller can update the order");
         require(
-            orders[_orderNumber].status == OrderStatus.Created,
-            "Order status is not Created"
+            orders[_orderNumber].status == OrderStatus.Created || orders[_orderNumber].status == OrderStatus.Updated,
+            "Order status is not Created or Updated or has been deposited"
         );
         require(_price > 0, "The price should be greater than 0");
         require(bytes(_name).length > 0, "The name should not be empty");
