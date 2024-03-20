@@ -481,6 +481,322 @@
           ]
         }
       }
+    },
+    "eed6580bb9d10d801e4b23708701bc45b05e5dff59cbc1ee0f213414d21c6517": {
+      "address": "0x01C5317e8d4cE6732aE7De88F975a173Af320FA2",
+      "txHash": "0xad14ed6d1af2bd6bd07dcf930f3ddb15b12c90444c86b4c4f764d8bd46b40145",
+      "layout": {
+        "solcVersion": "0.8.20",
+        "storage": [
+          {
+            "label": "owner",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:22"
+          },
+          {
+            "label": "currency",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(ERC20)905",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:25"
+          },
+          {
+            "label": "productManager",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IProductManager)1081",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:26"
+          },
+          {
+            "label": "orderNumber",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:29"
+          },
+          {
+            "label": "orders",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_mapping(t_uint256,t_struct(Order)1114_storage)",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:47"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)81_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ERC20)905": {
+            "label": "contract ERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IProductManager)1081": {
+            "label": "contract IProductManager",
+            "numberOfBytes": "20"
+          },
+          "t_enum(OrderStatus)1104": {
+            "label": "enum Exchange.OrderStatus",
+            "members": [
+              "Created",
+              "Deposited",
+              "Finished",
+              "Updated",
+              "Cancelled"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_struct(Order)1114_storage)": {
+            "label": "mapping(uint256 => struct Exchange.Order)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Order)1114_storage": {
+            "label": "struct Exchange.Order",
+            "members": [
+              {
+                "label": "orderId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "seller",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "buyer",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(OrderStatus)1104",
+                "offset": 20,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "7ef2ea4c1170467290afeaf28778f45aa38bf2396bdcc2ea1e1e20b50732e64e": {
+      "address": "0x7488F1c9c262d826139962Bf4e8b8C32F52aF860",
+      "txHash": "0x3ee93b729035e8ad909b7e39a80ffda68b0435d9095f4ffe0d1f2ab81e56fd03",
+      "layout": {
+        "solcVersion": "0.8.20",
+        "storage": [
+          {
+            "label": "owner",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:22"
+          },
+          {
+            "label": "currency",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(ERC20)905",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:25"
+          },
+          {
+            "label": "productManager",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IProductManager)1081",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:26"
+          },
+          {
+            "label": "orderNumber",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:29"
+          },
+          {
+            "label": "orders",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_mapping(t_uint256,t_struct(Order)1114_storage)",
+            "contract": "Exchange",
+            "src": "contracts/OrderManager.sol:47"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)81_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ERC20)905": {
+            "label": "contract ERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IProductManager)1081": {
+            "label": "contract IProductManager",
+            "numberOfBytes": "20"
+          },
+          "t_enum(OrderStatus)1104": {
+            "label": "enum Exchange.OrderStatus",
+            "members": [
+              "Created",
+              "Deposited",
+              "Finished",
+              "Updated",
+              "Cancelled"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_struct(Order)1114_storage)": {
+            "label": "mapping(uint256 => struct Exchange.Order)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Order)1114_storage": {
+            "label": "struct Exchange.Order",
+            "members": [
+              {
+                "label": "orderId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "seller",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "buyer",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(OrderStatus)1104",
+                "offset": 20,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
     }
   }
 }

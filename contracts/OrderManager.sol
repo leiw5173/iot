@@ -101,7 +101,7 @@ contract Exchange is Initializable {
     function cancelOrderBySeller(uint256 _orderNumber) public {
         require(orders[_orderNumber].seller == msg.sender, "Only the seller can cancel the order");
         require(
-            orders[_orderNumber].status == OrderStatus.Created,
+            orders[_orderNumber].status == OrderStatus.Created || orders[_orderNumber].status == OrderStatus.Updated,
             "Order status is not Created or has been deposited"
         );
         productManager.deleteProduct(_orderNumber);
@@ -123,6 +123,8 @@ contract Exchange is Initializable {
             currency.balanceOf(msg.sender) >= price,
             "The buyer does not have enough currency"
         );
+        require( orders[_orderNumber].seller != msg.sender, "The seller cannot deposit currency" );
+        
         orders[_orderNumber].buyer = msg.sender;
 
         currency.transferFrom(msg.sender, address(this), price);
