@@ -22,7 +22,7 @@ module.exports = {
     },
     neox: {
       url: NEOX_RPC_URL,
-      chainId: 12227330,
+      chainId: 12227331,
       accounts: [PRIVATE_KEY, PRIVATE_KEY_1, PRIVATE_KEY_2],
       blockConfirmations: 2,
       gas: 25e6,
