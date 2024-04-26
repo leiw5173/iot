@@ -46,9 +46,11 @@ async function setPriceAndGoods() {
   await tx.wait();
   await sleep(sleepTime);
 
-  console.log(await exchangeContract.connect(alice).orderNumber());
+  const orderNumber = await exchangeContract.connect(alice).orderNumber();
 
-  const order = await exchangeContract.connect(alice).getOrder(1);
+  console.log(orderNumber.toString());
+
+  const order = await exchangeContract.connect(alice).getOrder(orderNumber);
   console.log(order);
 
   console.log(`OrderID: ${order[0]}`);
