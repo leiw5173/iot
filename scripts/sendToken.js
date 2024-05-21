@@ -37,7 +37,12 @@ async function sendToken() {
   }
 
   const token = await ethers.getContractAt("Currency", iotContractAddr);
-  const tx = await token.connect(alice).transfer(bob.address, 1 * multiplier);
+
+  for (let i = 0; i < 1000; i++) {
+    console.log(`Transfering ${i} time`);
+    await token.connect(alice).transfer(bob.address, 1 * multiplier);
+  }
+  // const tx = await token.connect(alice).transfer(bob.address, 1 * multiplier);
   //   await tx.wait();
 
   //   const balance = await token.connect(bob).balanceOf(bob.address);
